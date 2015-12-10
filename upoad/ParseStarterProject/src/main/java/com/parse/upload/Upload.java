@@ -219,8 +219,10 @@ public class Upload extends Fragment implements View.OnClickListener {
 
                     String filename;
                     filename = getRandomString(12);
+                    String full_name;
+                    full_name = "app_"+filename;
                     // Create the ParseFile
-                    file = new ParseFile(filename, image);
+                    file = new ParseFile(full_name, image);
 
 
                 }
