@@ -140,25 +140,11 @@ public class Upload extends Fragment implements View.OnClickListener {
                     .setPositiveButton("Да!", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ParsePush push = new ParsePush();
                             String message = pushText.getText().toString();
                             if (message.equals("")) {
                                 Utils.showAlert(getActivity(), "НАКОСЯЧИЛ", "Нельзя отослать пустой ПУШ!");
                             } else {
-                                push.setChannel("photos");
-                                push.setMessage(message);
-                                push.sendInBackground(new SendCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e == null) {
-                                            Utils.showAlert(getActivity(), "Красавчег", "Все кто хотел получили ПУШ");
-                                        } else {
-                                            Utils.showAlert(getActivity(), "Косяк на сервере", "Что то пошло не так!");
-                                        }
-
-                                    }
-
-                                });
+                               sendPushNotification(message);
                             }
 
                         }
@@ -377,6 +363,25 @@ public class Upload extends Fragment implements View.OnClickListener {
         for (int i = 0; i < sizeOfRandomString; ++i)
             sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
         return sb.toString();
+    }
+
+    public void sendPushNotification(String message){
+        ParsePush push = new ParsePush();
+
+        push.setChannel("photos");
+        push.setMessage(message);
+        push.sendInBackground(new SendCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Utils.showAlert(getActivity(), "Красавчег", "Все кто хотел получили ПУШ");
+                } else {
+                    Utils.showAlert(getActivity(), "Косяк на сервере", "Что то пошло не так!");
+                }
+
+            }
+
+        });
     }
 
 }
