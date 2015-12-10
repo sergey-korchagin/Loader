@@ -27,7 +27,6 @@ public class MainActivity extends ActionBarActivity {
     ParseAnalytics.trackAppOpenedInBackground(getIntent());
     ParseInstallation installation = ParseInstallation.getCurrentInstallation();
     installation.saveInBackground();
-
       Upload splashScreenFragment = new Upload();
       Utils.replaceFragment(getFragmentManager(), android.R.id.content, splashScreenFragment, false);
   }

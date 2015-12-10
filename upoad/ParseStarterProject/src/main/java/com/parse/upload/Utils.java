@@ -1,10 +1,13 @@
 package com.parse.upload;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 /**
  * Created by User on 10/12/2015.
@@ -30,5 +33,10 @@ public class Utils {
 
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    public static void hideSoftKeyboard(Activity activity,View root) {
+        InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(root.getWindowToken(), 0);
     }
 }

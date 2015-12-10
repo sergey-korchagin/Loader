@@ -1542,13 +1542,13 @@ containing a value of this type.
         public static final int action_mode_bar=0x7f0c003d;
         public static final int action_mode_bar_stub=0x7f0c003c;
         public static final int action_mode_close_button=0x7f0c0025;
-        public static final int action_settings=0x7f0c005f;
+        public static final int action_settings=0x7f0c0061;
         public static final int activity_chooser_view_content=0x7f0c0026;
         public static final int alertTitle=0x7f0c0030;
         public static final int always=0x7f0c0016;
         public static final int beginning=0x7f0c0013;
         public static final int buttonPanel=0x7f0c0036;
-        public static final int buttonPush=0x7f0c005e;
+        public static final int buttonPush=0x7f0c0060;
         public static final int buttonUpload=0x7f0c005d;
         public static final int cancel_action=0x7f0c0050;
         public static final int checkbox=0x7f0c0038;
@@ -1586,6 +1586,7 @@ containing a value of this type.
         public static final int parentPanel=0x7f0c002d;
         public static final int progress_circular=0x7f0c0005;
         public static final int progress_horizontal=0x7f0c0006;
+        public static final int pushText=0x7f0c005f;
         public static final int radio=0x7f0c003a;
         public static final int screen=0x7f0c001f;
         public static final int scrollView=0x7f0c0032;
@@ -1614,6 +1615,7 @@ containing a value of this type.
         public static final int text=0x7f0c0059;
         public static final int text2=0x7f0c0057;
         public static final int textSpacerNoButtons=0x7f0c0033;
+        public static final int textView=0x7f0c005e;
         public static final int time=0x7f0c0055;
         public static final int title=0x7f0c002c;
         public static final int title_template=0x7f0c002f;

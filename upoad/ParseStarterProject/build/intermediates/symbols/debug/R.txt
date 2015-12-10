@@ -425,13 +425,13 @@ int id action_menu_presenter 0x7f0c0003
 int id action_mode_bar 0x7f0c003d
 int id action_mode_bar_stub 0x7f0c003c
 int id action_mode_close_button 0x7f0c0025
-int id action_settings 0x7f0c005f
+int id action_settings 0x7f0c0061
 int id activity_chooser_view_content 0x7f0c0026
 int id alertTitle 0x7f0c0030
 int id always 0x7f0c0016
 int id beginning 0x7f0c0013
 int id buttonPanel 0x7f0c0036
-int id buttonPush 0x7f0c005e
+int id buttonPush 0x7f0c0060
 int id buttonUpload 0x7f0c005d
 int id cancel_action 0x7f0c0050
 int id checkbox 0x7f0c0038
@@ -469,6 +469,7 @@ int id normal 0x7f0c000a
 int id parentPanel 0x7f0c002d
 int id progress_circular 0x7f0c0005
 int id progress_horizontal 0x7f0c0006
+int id pushText 0x7f0c005f
 int id radio 0x7f0c003a
 int id screen 0x7f0c001f
 int id scrollView 0x7f0c0032
@@ -497,6 +498,7 @@ int id tabMode 0x7f0c000b
 int id text 0x7f0c0059
 int id text2 0x7f0c0057
 int id textSpacerNoButtons 0x7f0c0033
+int id textView 0x7f0c005e
 int id time 0x7f0c0055
 int id title 0x7f0c002c
 int id title_template 0x7f0c002f

@@ -1,5 +1,6 @@
 package com.parse.upload;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -23,7 +24,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.parse.ParseACL;
@@ -59,6 +62,7 @@ public class Upload extends Fragment implements View.OnClickListener {
     boolean videoSelected = false;
     int orientation;
     private Uri mHighQualityImageUri = null;
+    EditText pushText;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.upload_fragment, container, false);
@@ -66,8 +70,13 @@ public class Upload extends Fragment implements View.OnClickListener {
         uploadImage.setOnClickListener(this);
         uploadBtn = (Button) root.findViewById(R.id.buttonUpload);
         uploadBtn.setOnClickListener(this);
-        sendPush = (Button)root.findViewById(R.id.buttonPush);
+        sendPush = (Button) root.findViewById(R.id.buttonPush);
         sendPush.setOnClickListener(this);
+        pushText = (EditText) root.findViewById(R.id.pushText);
+        root.clearFocus();
+        pushText.clearFocus();
+        Utils.hideSoftKeyboard(getActivity(), root);
+        ;
         return root;
     }
 
@@ -79,35 +88,52 @@ public class Upload extends Fragment implements View.OnClickListener {
             startActivityForResult(pickPhoto, REQUEST_CODE_FROM_GALLERY_IMAGE);
         } else if (v.getId() == uploadBtn.getId()) {
             if (file != null) {
+
                 progressDialog = ProgressDialog.show(getActivity(), "", "Загружается");
-                ParseACL acl = new ParseACL();
-                acl.setPublicReadAccess(true);
-                ParseObject recipe1 = new ParseObject("picture");
-                recipe1.put("mPicture", file);
-                recipe1.put("likes", 3);
-                recipe1.setACL(acl);
-                recipe1.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e == null) {
-                            progressDialog.dismiss();
-                            Utils.showAlert(getActivity(), "", "Загрузилось на сервер! Спасибо!");
-                        } else {
-                            progressDialog.dismiss();
-                            Utils.showAlert(getActivity(), "ERROR!", e.getLocalizedMessage().toString());
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setCancelable(true).setMessage("Уверен что хочешь залить именно эту картинку?")
+                        .setPositiveButton("Отвечаю!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ParseACL acl = new ParseACL();
+                                acl.setPublicReadAccess(true);
+                                ParseObject recipe1 = new ParseObject("picture");
+                                recipe1.put("mPicture", file);
+                                recipe1.put("likes", 3);
+                                recipe1.setACL(acl);
+                                recipe1.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+                                            progressDialog.dismiss();
+                                            Utils.showAlert(getActivity(), "", "Загрузилось на сервер! Спасибо!");
+                                        } else {
+                                            progressDialog.dismiss();
+                                            Utils.showAlert(getActivity(), "ERROR!", e.getLocalizedMessage().toString());
+
+                                        }
+                                    }
+                                });
 
 
-                        }
-                    }
-                });
-
+                            }
+                        })
+                        .setNegativeButton("Нет, прогнал!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                Window window = alert.getWindow();
+                window.setGravity(Gravity.CENTER);
+                alert.show();
 
             } else {
                 Utils.showAlert(getActivity(), "ERROR!!", "Надо выбрать фото биджо!!");
             }
 
-        }
-        else if(v.getId() == sendPush.getId()){
+        } else if (v.getId() == sendPush.getId()) {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setCancelable(true).setMessage("Уверен что хочешь послать всем ПУШ?")
@@ -115,21 +141,26 @@ public class Upload extends Fragment implements View.OnClickListener {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             ParsePush push = new ParsePush();
-                            String message = "Добавлены новые картинки! Скорее иди смотреть!";
-                            push.setChannel("photos");
-                            push.setMessage(message);
-                            push.sendInBackground(new SendCallback(){
-                                @Override
-                                public void done(ParseException e) {
-                                    if(e == null){
-                                        Utils.showAlert(getActivity(),"Красавчег","Все кто хотел получили ПУШ");
-                                    }else {
-                                        Utils.showAlert(getActivity(),"Косяк на сервере","Что то пошло не так!");
+                            String message = pushText.getText().toString();
+                            if (message.equals("")) {
+                                Utils.showAlert(getActivity(), "НАКОСЯЧИЛ", "Нельзя отослать пустой ПУШ!");
+                            } else {
+                                push.setChannel("photos");
+                                push.setMessage(message);
+                                push.sendInBackground(new SendCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+                                            Utils.showAlert(getActivity(), "Красавчег", "Все кто хотел получили ПУШ");
+                                        } else {
+                                            Utils.showAlert(getActivity(), "Косяк на сервере", "Что то пошло не так!");
+                                        }
+
                                     }
 
-                                }
+                                });
+                            }
 
-                            });
                         }
                     })
                     .setNegativeButton("Нет, затупил!", new DialogInterface.OnClickListener() {
@@ -264,7 +295,7 @@ public class Upload extends Fragment implements View.OnClickListener {
                     String filename;
                     filename = getRandomString(12);
                     String full_name;
-                    full_name = "app_"+filename;
+                    full_name = "app_" + filename;
                     // Create the ParseFile
                     file = new ParseFile(full_name, image);
 
