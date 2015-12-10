@@ -1,7 +1,9 @@
 package com.parse.upload;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -16,9 +18,11 @@ import android.provider.MediaStore;
 import android.provider.SyncStateContract;
 import android.text.format.Time;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -26,7 +30,9 @@ import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.SaveCallback;
+import com.parse.SendCallback;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -48,7 +54,7 @@ public class Upload extends Fragment implements View.OnClickListener {
     private static final String ALLOWED_CHARACTERS = "0123456789qwertyuiopasdfghjklzxcvbnm";
 
     ParseFile file;
-
+    Button sendPush;
 
     boolean videoSelected = false;
     int orientation;
@@ -60,6 +66,8 @@ public class Upload extends Fragment implements View.OnClickListener {
         uploadImage.setOnClickListener(this);
         uploadBtn = (Button) root.findViewById(R.id.buttonUpload);
         uploadBtn.setOnClickListener(this);
+        sendPush = (Button)root.findViewById(R.id.buttonPush);
+        sendPush.setOnClickListener(this);
         return root;
     }
 
@@ -98,6 +106,42 @@ public class Upload extends Fragment implements View.OnClickListener {
                 Utils.showAlert(getActivity(), "ERROR!!", "Надо выбрать фото биджо!!");
             }
 
+        }
+        else if(v.getId() == sendPush.getId()){
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setCancelable(true).setMessage("Уверен что хочешь послать всем ПУШ?")
+                    .setPositiveButton("Да!", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ParsePush push = new ParsePush();
+                            String message = "Добавлены новые картинки! Скорее иди смотреть!";
+                            push.setChannel("photos");
+                            push.setMessage(message);
+                            push.sendInBackground(new SendCallback(){
+                                @Override
+                                public void done(ParseException e) {
+                                    if(e == null){
+                                        Utils.showAlert(getActivity(),"Красавчег","Все кто хотел получили ПУШ");
+                                    }else {
+                                        Utils.showAlert(getActivity(),"Косяк на сервере","Что то пошло не так!");
+                                    }
+
+                                }
+
+                            });
+                        }
+                    })
+                    .setNegativeButton("Нет, затупил!", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            Window window = alert.getWindow();
+            window.setGravity(Gravity.CENTER);
+            alert.show();
 
         }
     }
