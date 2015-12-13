@@ -37,6 +37,8 @@ import com.parse.ParsePush;
 import com.parse.SaveCallback;
 import com.parse.SendCallback;
 
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Random;
@@ -97,9 +99,11 @@ public class Upload extends Fragment implements View.OnClickListener {
                             public void onClick(DialogInterface dialog, int which) {
                                 ParseACL acl = new ParseACL();
                                 acl.setPublicReadAccess(true);
+                                acl.setPublicWriteAccess(true);
                                 ParseObject recipe1 = new ParseObject("picture");
                                 recipe1.put("mPicture", file);
-                                recipe1.put("likes", 3);
+
+                                recipe1.put("likes", Utils.getRandomInt());
                                 recipe1.setACL(acl);
                                 recipe1.saveInBackground(new SaveCallback() {
                                     @Override
@@ -274,7 +278,7 @@ public class Upload extends Fragment implements View.OnClickListener {
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
                     //    Compress image to lower quality scale 1 - 100
-                    photo.compress(Bitmap.CompressFormat.JPEG, 20, stream);
+                    photo.compress(Bitmap.CompressFormat.JPEG, 10, stream);
                     byte[] image = stream.toByteArray();
 
 
@@ -369,7 +373,17 @@ public class Upload extends Fragment implements View.OnClickListener {
         ParsePush push = new ParsePush();
 
         push.setChannel("photos");
-        push.setMessage(message);
+   //     push.setMessage(message);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("title","Нафаня");
+            jsonObject.put("alert",message);
+            jsonObject.put("action","action.add.badge");
+        }catch (Throwable e){
+            e.printStackTrace();
+        }
+
+        push.setData(jsonObject);
         push.sendInBackground(new SendCallback() {
             @Override
             public void done(ParseException e) {

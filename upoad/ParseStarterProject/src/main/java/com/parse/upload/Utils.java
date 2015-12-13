@@ -9,6 +9,8 @@ import android.content.Context;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import java.util.Random;
+
 /**
  * Created by User on 10/12/2015.
  */
@@ -38,5 +40,11 @@ public class Utils {
     public static void hideSoftKeyboard(Activity activity,View root) {
         InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(root.getWindowToken(), 0);
+    }
+
+    public static int getRandomInt(){
+        Random r = new Random();
+        int i1 = r.nextInt(15 - 2) + 2;
+        return i1;
     }
 }
