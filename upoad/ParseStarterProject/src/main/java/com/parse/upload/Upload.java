@@ -29,11 +29,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.parse.FindCallback;
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
+import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 import com.parse.SendCallback;
 
@@ -41,6 +43,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -57,7 +60,7 @@ public class Upload extends Fragment implements View.OnClickListener {
     Bitmap photo = null;
     ProgressDialog progressDialog;
     private static final String ALLOWED_CHARACTERS = "0123456789qwertyuiopasdfghjklzxcvbnm";
-
+    int newNum;
     ParseFile file;
     Button sendPush;
 
@@ -78,7 +81,7 @@ public class Upload extends Fragment implements View.OnClickListener {
         root.clearFocus();
         pushText.clearFocus();
         Utils.hideSoftKeyboard(getActivity(), root);
-        ;
+        setPictureNumber();
         return root;
     }
 
@@ -90,7 +93,6 @@ public class Upload extends Fragment implements View.OnClickListener {
             startActivityForResult(pickPhoto, REQUEST_CODE_FROM_GALLERY_IMAGE);
         } else if (v.getId() == uploadBtn.getId()) {
             if (file != null) {
-
                 progressDialog = ProgressDialog.show(getActivity(), "", "Загружается");
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setCancelable(true).setMessage("Уверен что хочешь залить именно эту картинку?")
@@ -104,6 +106,7 @@ public class Upload extends Fragment implements View.OnClickListener {
                                 recipe1.put("mPicture", file);
 
                                 recipe1.put("likes", Utils.getRandomInt());
+                                recipe1.put("pictureNum",newNum);
                                 recipe1.setACL(acl);
                                 recipe1.saveInBackground(new SaveCallback() {
                                     @Override
@@ -166,6 +169,31 @@ public class Upload extends Fragment implements View.OnClickListener {
 
         }
     }
+
+public void setPictureNumber() {
+    ParseQuery query = new ParseQuery("picture");
+    query.addDescendingOrder("createdAt");
+    query.setLimit(1);
+    query.findInBackground(new FindCallback() {
+        @Override
+        public void done(List objects, ParseException e) {
+        }
+
+        @Override
+        public void done(Object o, Throwable throwable) {
+            if (o instanceof List) {
+                List<ParseObject> num = (List<ParseObject>) o;
+                if (num.get(0).get("pictureNum") != null) {
+                    newNum = ((int) num.get(0).get("pictureNum")) + 1;
+                }
+
+            }
+        }
+    });
+    
+}
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
