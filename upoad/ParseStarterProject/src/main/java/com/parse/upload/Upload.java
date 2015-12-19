@@ -190,7 +190,7 @@ public void setPictureNumber() {
             }
         }
     });
-    
+
 }
 
 
@@ -306,7 +306,7 @@ public void setPictureNumber() {
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
                     //    Compress image to lower quality scale 1 - 100
-                    photo.compress(Bitmap.CompressFormat.JPEG, 10, stream);
+                    photo.compress(Bitmap.CompressFormat.JPEG, 20, stream);
                     byte[] image = stream.toByteArray();
 
 
