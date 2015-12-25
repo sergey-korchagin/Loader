@@ -28,6 +28,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseACL;
@@ -114,6 +115,7 @@ public class Upload extends Fragment implements View.OnClickListener {
                                         if (e == null) {
                                             progressDialog.dismiss();
                                             Utils.showAlert(getActivity(), "", "Загрузилось на сервер! Спасибо!");
+                                            setPictureNumber();
                                         } else {
                                             progressDialog.dismiss();
                                             Utils.showAlert(getActivity(), "ERROR!", e.getLocalizedMessage().toString());
@@ -185,6 +187,40 @@ public void setPictureNumber() {
                 List<ParseObject> num = (List<ParseObject>) o;
                 if (num.get(0).get("pictureNum") != null) {
                     newNum = ((int) num.get(0).get("pictureNum")) + 1;
+                    if(newNum%10==0){
+                        ParseACL acl = new ParseACL();
+                        acl.setPublicReadAccess(true);
+                        acl.setPublicWriteAccess(true);
+                        ParseObject recipe1 = new ParseObject("picture");
+                        ParseFile file1;
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+                        //    Compress image to lower quality scale 1 - 100
+                        Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.dummy);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 10, stream);
+                        byte[] image = stream.toByteArray();
+                        String full_name;
+                        full_name = "banner";
+                        // Create the ParseFile
+                        file1 = new ParseFile(full_name, image);
+                        recipe1.put("mPicture", file1);
+                        recipe1.put("likes",0);
+                        recipe1.put("pictureNum",newNum);
+                        recipe1.setACL(acl);
+                        recipe1.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    Toast toast = Toast.makeText(getActivity(), "Ad created", Toast.LENGTH_SHORT);
+                                    toast.show();
+                                } else {
+                                    e.printStackTrace();
+
+                                }
+                            }
+                        });
+                        newNum++;
+                    }
                 }
 
             }
