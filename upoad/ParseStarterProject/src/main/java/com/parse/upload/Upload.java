@@ -105,7 +105,7 @@ public class Upload extends Fragment implements View.OnClickListener {
                                 acl.setPublicWriteAccess(true);
                                 ParseObject recipe1 = new ParseObject("picture");
                                 recipe1.put("mPicture", file);
-
+                                recipe1.put("isBanner", "image");
                                 recipe1.put("likes", Utils.getRandomInt());
                                 recipe1.put("pictureNum",newNum);
                                 recipe1.setACL(acl);
@@ -206,6 +206,7 @@ public void setPictureNumber() {
                         recipe1.put("mPicture", file1);
                         recipe1.put("likes",0);
                         recipe1.put("pictureNum",newNum);
+                        recipe1.put("isBanner", "banner");
                         recipe1.setACL(acl);
                         recipe1.saveInBackground(new SaveCallback() {
                             @Override
