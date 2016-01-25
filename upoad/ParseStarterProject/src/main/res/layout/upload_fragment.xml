@@ -21,16 +21,61 @@
                 android:id="@+id/uploadImage"
                 android:layout_gravity="center_horizontal" />
 
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Кол-во фоток на сервере:"
+                    android:id="@+id/textView2" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="0"
+                    android:id="@+id/txtQuantity"
+                    android:layout_marginLeft="10dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select"
+                    android:id="@+id/btnSelect" />
+
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Upload"
+                    android:id="@+id/buttonUpload"
+                    android:layout_marginLeft="20dp"
+                    android:layout_gravity="center_horizontal" />
+            </LinearLayout>
+
+            <Spinner
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Upload"
-                android:id="@+id/buttonUpload"
-                android:layout_gravity="center_horizontal" />
+                android:id="@+id/spinner" />
 
             <View
                 android:layout_width="fill_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 android:layout_height="2dp"
                 android:background="#000000"
                 ></View>
@@ -42,7 +87,7 @@
                 android:text="Push Текст"
                 android:textStyle="bold"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="1dp"
                 android:layout_gravity="center"
                 android:id="@+id/textView" />
 
@@ -59,9 +104,21 @@
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:text="Send push"
                 android:id="@+id/buttonPush"
+                android:layout_gravity="center_horizontal" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:background="#000000"
+                ></View>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="delete 20"
+                android:id="@+id/btnDelete"
                 android:layout_gravity="center_horizontal" />
         </LinearLayout>
     </ScrollView>

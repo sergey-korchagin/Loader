@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="ImageType">
+        <item>All</item>
+        <item>Dogs</item>
+        <item>Cats</item>
+        <item>Children</item>
+        <item>Cinema</item>
+        <item>Sport</item>
+        <item>Girls</item>
+    </string-array>
+</resources>

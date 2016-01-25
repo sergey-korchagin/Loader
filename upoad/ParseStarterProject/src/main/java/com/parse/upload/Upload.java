@@ -25,11 +25,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.CountCallback;
 import com.parse.FindCallback;
 import com.parse.ParseACL;
 import com.parse.ParseException;
@@ -44,6 +49,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -51,10 +57,12 @@ import java.util.Random;
  * Created by User on 10/12/2015.
  */
 
-public class Upload extends Fragment implements View.OnClickListener {
+public class Upload extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     ImageView uploadImage;
     Button uploadBtn;
+    Button selectBtn;
+    Button deleteBtn;
     private final int REQUEST_CODE_FROM_GALLERY_IMAGE = 1;
     private final int REQUEST_CODE_HIGH_QUALITY_IMAGE = 2;
     private static final String IMAGE_DIRECTORY_NAME = "Hello Camera";
@@ -64,31 +72,48 @@ public class Upload extends Fragment implements View.OnClickListener {
     int newNum;
     ParseFile file;
     Button sendPush;
-
+    ArrayList<String> deletedIds;
     boolean videoSelected = false;
     int orientation;
     private Uri mHighQualityImageUri = null;
     EditText pushText;
+    TextView numOfPics;
+    Spinner spinner;
+    String imageType = "image";
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.upload_fragment, container, false);
         uploadImage = (ImageView) root.findViewById(R.id.uploadImage);
-        uploadImage.setOnClickListener(this);
         uploadBtn = (Button) root.findViewById(R.id.buttonUpload);
         uploadBtn.setOnClickListener(this);
+        selectBtn = (Button)root.findViewById(R.id.btnSelect);
+        selectBtn.setOnClickListener(this);
         sendPush = (Button) root.findViewById(R.id.buttonPush);
         sendPush.setOnClickListener(this);
         pushText = (EditText) root.findViewById(R.id.pushText);
+
+        numOfPics = (TextView)root.findViewById(R.id.txtQuantity);
+
+        deleteBtn = (Button)root.findViewById(R.id.btnDelete);
+        deleteBtn.setOnClickListener(this);
+        deletedIds = new ArrayList<>();
         root.clearFocus();
         pushText.clearFocus();
         Utils.hideSoftKeyboard(getActivity(), root);
         setPictureNumber();
+
+        spinner = (Spinner) root.findViewById(R.id.spinner);
+        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(getActivity(), R.array.ImageType, android.R.layout.simple_spinner_item);
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter1);
+        spinner.setOnItemSelectedListener(this);
         return root;
     }
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == uploadImage.getId()) {
+        if (v.getId() == selectBtn.getId()) {
             Intent pickPhoto = new Intent(Intent.ACTION_PICK,
                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(pickPhoto, REQUEST_CODE_FROM_GALLERY_IMAGE);
@@ -96,7 +121,7 @@ public class Upload extends Fragment implements View.OnClickListener {
             if (file != null) {
                 progressDialog = ProgressDialog.show(getActivity(), "", "Загружается");
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setCancelable(true).setMessage("Уверен что хочешь залить именно эту картинку?")
+                builder.setCancelable(true).setMessage("Уверен что хочешь залить именно эту картинку? И не забыл выбрать категорию?")
                         .setPositiveButton("Отвечаю!", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -105,7 +130,7 @@ public class Upload extends Fragment implements View.OnClickListener {
                                 acl.setPublicWriteAccess(true);
                                 ParseObject recipe1 = new ParseObject("picture");
                                 recipe1.put("mPicture", file);
-                                recipe1.put("isBanner", "image");
+                                recipe1.put("isBanner", imageType);
                                 recipe1.put("likes", Utils.getRandomInt());
                                 recipe1.put("pictureNum",newNum);
                                 recipe1.setACL(acl);
@@ -115,6 +140,7 @@ public class Upload extends Fragment implements View.OnClickListener {
                                         if (e == null) {
                                             progressDialog.dismiss();
                                             Utils.showAlert(getActivity(), "", "Загрузилось на сервер! Спасибо!");
+                                            uploadImage.setImageDrawable(getResources().getDrawable(R.drawable.q));
                                             setPictureNumber();
                                         } else {
                                             progressDialog.dismiss();
@@ -169,7 +195,71 @@ public class Upload extends Fragment implements View.OnClickListener {
             window.setGravity(Gravity.CENTER);
             alert.show();
 
+        }else if(deleteBtn.getId() == v.getId()){
+            deleteRows();
         }
+    }
+
+    public void deleteRows(){
+        ParseQuery query = new ParseQuery("picture");
+        query.addAscendingOrder("createdAt");
+        query.setLimit(20);
+        query.findInBackground(new FindCallback() {
+            @Override
+            public void done(List objects, ParseException e) {
+            }
+
+            @Override
+            public void done(Object o, Throwable throwable) {
+                if (o instanceof List) {
+                  final  List<ParseObject> num = (List<ParseObject>) o;
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setCancelable(true).setMessage("Уверен что хочешь стереть 20?")
+                            .setPositiveButton("Да!", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    for(int i=0; i<num.size();i++){
+                                        deletedIds.add(num.get(i).getObjectId().toString());
+                                        ParseObject.createWithoutData("picture", num.get(i).getObjectId().toString()).deleteEventually();
+                                    }
+                                    ParseACL acl = new ParseACL();
+                                    acl.setPublicReadAccess(true);
+                                    acl.setPublicWriteAccess(true);
+                                    ParseObject deleted = new ParseObject("deletedIt");
+                                    deleted.put("deletedItems", deletedIds);
+                                    deleted.setACL(acl);
+
+                                    deleted.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e == null) {
+                                                Utils.showAlert(getActivity(), "Deleted", "deleted 20 last images");
+
+                                            } else {
+                                                Utils.showAlert(getActivity(), "ERROR!", e.getLocalizedMessage().toString());
+
+                                            }
+                                        }
+                                    });
+
+                                }
+                            })
+                            .setNegativeButton("Нет, затупил!", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    Window window = alert.getWindow();
+                    window.setGravity(Gravity.CENTER);
+                    alert.show();
+
+
+                }
+            }
+        });
     }
 
 public void setPictureNumber() {
@@ -187,41 +277,15 @@ public void setPictureNumber() {
                 List<ParseObject> num = (List<ParseObject>) o;
                 if (num.get(0).get("pictureNum") != null) {
                     newNum = ((int) num.get(0).get("pictureNum")) + 1;
-                    if(newNum%10==0){
-                        ParseACL acl = new ParseACL();
-                        acl.setPublicReadAccess(true);
-                        acl.setPublicWriteAccess(true);
-                        ParseObject recipe1 = new ParseObject("picture");
-                        ParseFile file1;
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                   // numOfPics.setText(Integer.toString((newNum-1)));
 
-                        //    Compress image to lower quality scale 1 - 100
-                        Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.dummy);
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 10, stream);
-                        byte[] image = stream.toByteArray();
-                        String full_name;
-                        full_name = "banner";
-                        // Create the ParseFile
-                        file1 = new ParseFile(full_name, image);
-                        recipe1.put("mPicture", file1);
-                        recipe1.put("likes",0);
-                        recipe1.put("pictureNum",newNum);
-                        recipe1.put("isBanner", "banner");
-                        recipe1.setACL(acl);
-                        recipe1.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                if (e == null) {
-                                    Toast toast = Toast.makeText(getActivity(), "Ad created", Toast.LENGTH_SHORT);
-                                    toast.show();
-                                } else {
-                                    e.printStackTrace();
-
-                                }
-                            }
-                        });
-                        newNum++;
-                    }
+                    ParseQuery query = new ParseQuery("picture");
+                    query.countInBackground(new CountCallback() {
+                        @Override
+                        public void done(int count, ParseException e) {
+                            numOfPics.setText(Integer.toString(count));
+                        }
+                    });
                 }
 
             }
@@ -343,14 +407,14 @@ public void setPictureNumber() {
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
                     //    Compress image to lower quality scale 1 - 100
-                    photo.compress(Bitmap.CompressFormat.JPEG, 20, stream);
+                    photo.compress(Bitmap.CompressFormat.JPEG, 70, stream);
                     byte[] image = stream.toByteArray();
 
 
                     String filename;
                     filename = getRandomString(12);
                     String full_name;
-                    full_name = "app_" + filename;
+                    full_name = "app_" + filename+".jpeg";
                     // Create the ParseFile
                     file = new ParseFile(full_name, image);
 
@@ -463,4 +527,18 @@ public void setPictureNumber() {
         });
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            if (position == 0) {
+                imageType = "image";
+            } else {
+                imageType = parent.getItemAtPosition(position).toString();
+
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        imageType = "image";
+    }
 }
