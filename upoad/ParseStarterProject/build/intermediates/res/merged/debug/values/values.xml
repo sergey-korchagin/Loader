@@ -4,12 +4,12 @@
     <eat-comment/>
     <string-array name="ImageType">
         <item>All</item>
-        <item>Dogs</item>
-        <item>Cats</item>
-        <item>Children</item>
-        <item>Cinema</item>
-        <item>Sport</item>
-        <item>Girls</item>
+        <item>Pets</item>
+        <item>People</item>
+        <item>Jokes</item>
+        <item>Funny images</item>
+        <item>Slang</item>
+        <item>Interesting facts</item>
     </string-array>
     <!-- From: file:/C:/Users/User/Desktop/Loader/Loader/upoad/ParseStarterProject/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
